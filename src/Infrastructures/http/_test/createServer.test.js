@@ -21,6 +21,24 @@ describe('http server', () => {
     await TruncateTableHelper.cleanTable();
   });
 
+  describe('when GET / endpoint',  () => {
+    it('should should return 200 and hello world', async () => {
+    //arrange
+      const server = await createServer({});
+
+      //act
+      const response = await server.inject({
+        method: 'GET',
+        url: '/',
+      });
+
+      //assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.value).toEqual('Hello world!');
+    });
+  });
+
   describe('JWT auth', () => {
     it('should return 200 adn validate token corectly for authentication', async () => {
       //arrange
