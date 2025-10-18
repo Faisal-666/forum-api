@@ -1,0 +1,10 @@
+/node_modules/
+/coverage/
+config/database/test.json
+*.zip
+*.env
+Forum API V2 Test.*.json
+FORUM-SERVER-SG-SSH-KEY.pem
+package-lock.json
+tsconfig.json
+jsconfig.json
