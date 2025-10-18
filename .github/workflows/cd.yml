@@ -19,6 +19,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
         script: |
+          ls
           cd ~/project/forum-api
           sudo chown -R $USER:$USER .
           git pull origin master
