@@ -1103,5 +1103,82 @@ describe('http server', () => {
       });
     });
 
+    describe('PUT  /threads/{threadId}/comments/{commentId}/likes endpoint', () => {
+      it('should response 401 when PUT with missing authentications', async () => {
+        //arrange
+        const server = await createServer({});
+
+        //act
+        const response = await server.inject({
+          method: 'PUT',
+          url: '/threads/thread-123/comments/comment-123/likes',
+        });
+
+        //assert
+        expect(response.statusCode).toEqual(401);
+      });
+
+      it('should response 404 when PUT with invalid thread|commentid', async () => {
+        //arrange
+        await UserTableTestHelper.addUser({ id: 'user-123', username:'bobpants' });
+        await UserTableTestHelper.addUser({ id: 'user-000', username:'spongeSquare' });
+        await ThreadTableTestHelper.addthread({ id: 'thread-123', title: 'ini judul thread', body:'ini isi thread' });
+        await CommentsTableTestHelper.addComment({ id: 'comment-123', thread_id: 'thread-123', username:'bobpants' });
+        const server = await createServer(container);
+        const token = Jwt.token.generate(
+          {
+            id: 'user-123',
+          },
+          {
+            key: config.token.acc_key,
+          },);
+
+        //act
+        const response = await server.inject({
+          method: 'PUT',
+          url: '/threads/thread-xxx/comments/comment-123/likes',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        //assert
+        const responseJson = JSON.parse(response.payload);
+        expect(response.statusCode).toEqual(404);
+        expect(responseJson.status).toEqual('fail');
+      });
+
+      it('should response 200 when PUT with valid payload', async () => {
+        //arrange
+        await UserTableTestHelper.addUser({ id: 'user-123', username:'bobpants' });
+        await UserTableTestHelper.addUser({ id: 'user-000', username:'spongeSquare' });
+        await ThreadTableTestHelper.addthread({ id: 'thread-123', title: 'ini judul thread', body:'ini isi thread' });
+        await CommentsTableTestHelper.addComment({ id: 'comment-123', thread_id: 'thread-123', username:'bobpants' });
+        const server = await createServer(container);
+        const token = Jwt.token.generate(
+          {
+            id: 'user-123',
+          },
+          {
+            key: config.token.acc_key,
+          },);
+
+        //act
+        const response = await server.inject({
+          method: 'PUT',
+          url: '/threads/thread-123/comments/comment-123/likes',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        //assert
+        const responseJson = JSON.parse(response.payload);
+        expect(response.statusCode).toEqual(200);
+        expect(responseJson.status).toEqual('success');
+        expect(responseJson.data).toBeDefined();
+      });
+    });
   });
 });
+
