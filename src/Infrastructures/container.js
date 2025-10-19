@@ -16,6 +16,7 @@ const JwtTokenManager = require('./token/JwtTokenManager');
 const ThreadRepositoryPostgres = require('../Infrastructures/repository/ThreadRepositoryPostgres');
 const CommentRepositoryPostgres = require('../Infrastructures/repository/CommentRepositoryPostgres');
 const ReplyRepositoryPostgres = require('../Infrastructures/repository/ReplyRepositoryPostgres');
+const LikesRepositoryPostgres = require('../Infrastructures/repository/LikeRepositoryPostgres');
 
 //usecase
 const AddUserUseCase = require('../Applications/use_case/AddUserUseCase');
@@ -35,6 +36,8 @@ const GetDetailThreadUseCase = require('../Applications/use_case/GetDetailThread
 const AddRepliesUseCase = require('../Applications/use_case/AddRepliesUseCase');
 const DeleteReplyUseCase = require('../Applications/use_case/DeleteReplyUseCase');
 const ReplyRepository = require('../Domains/reply/ReplyRepository');
+const LikeCommentUseCase = require('../Applications/use_case/LikeCommentUseCase');
+const LikesRepository = require('../Domains/like/LikeRepository');
 
 //creating container
 const container = createContainer();
@@ -135,7 +138,21 @@ container.register([
         },
       ],
     },
-  }
+  },
+  {
+    key: LikesRepository.name,
+    Class: LikesRepositoryPostgres,
+    parameter: {
+      dependencies: [
+        {
+          concrete: pool,
+        },
+        {
+          concrete: nanoid,
+        },
+      ],
+    },
+  },
 ]);
 
 //registering usecase
@@ -281,6 +298,10 @@ container.register([
           name: 'replyRepository',
           internal: ReplyRepository.name,
         },
+        {
+          name: 'likeRepository',
+          internal: LikesRepository.name,
+        },
       ],
     },
   },
@@ -330,6 +351,27 @@ container.register([
         {
           name: 'replyRepository',
           internal: ReplyRepository.name,
+        },
+      ],
+    },
+  },
+  {
+    key: LikeCommentUseCase.name,
+    Class: LikeCommentUseCase,
+    parameter:  {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'threadRepository',
+          internal: ThreadRepository.name,
+        },
+        {
+          name: 'commentRepository',
+          internal: CommentRepository.name,
+        },
+        {
+          name: 'likeRepository',
+          internal: LikesRepository.name,
         },
       ],
     },

@@ -8,6 +8,7 @@ const auth = require('../../Interfaces/http/api/auth');
 const threads = require('../../Interfaces/http/api/thread');
 const comments = require('../../Interfaces/http/api/comment');
 const replies = require('../../Interfaces/http/api/reply');
+const like = require('../../Interfaces/http/api/like');
 const ClientError = require('../../Commons/execptions/ClientError');
 const config = require('../../Commons/config');
 const DomainErrorTranslator = require('../../Commons/execptions/DomainErrorTranslator');
@@ -78,6 +79,10 @@ const createServer = async (container) => {
     },
     {
       plugin: replies,
+      options: { container },
+    },
+    {
+      plugin: like,
       options: { container },
     },
   ]);
